@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WA 404 | Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo-area">
+                <h2>WA <span class="accent">404</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-page="dashboard">Dashboard</a>
+                <a href="#" class="nav-item" data-page="accounts">Accounts Manager</a>
+                <a href="#" class="nav-item" data-page="campaigns">Campaigns</a>
+                <a href="#" class="nav-item" data-page="templates">Templates</a>
+                <a href="#" class="nav-item" data-page="inbox">Unified Inbox</a>
+                <a href="#" class="nav-item" data-page="extractor">Contact Extractor</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-nav glass-panel">
+                <div class="page-title">
+                    <h1 id="page-header">Dashboard Overview</h1>
+                </div>
+                <div class="user-profile">
+                    <div class="status-indicator online"></div> System Active
+                </div>
+            </header>
+
+            <div class="content-body" id="dynamic-content">
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="page-view active-view">
+                    <div class="dashboard-grid">
+                        <div class="stat-card glass-panel">
+                            <h3>Total Sent</h3>
+                            <div class="stat-value" id="stat-total">0</div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <h3>Delivered</h3>
+                            <div class="stat-value text-success" id="stat-delivered">0</div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <h3>Failed</h3>
+                            <div class="stat-value text-danger" id="stat-failed">0</div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <h3>Active Accounts</h3>
+                            <div class="stat-value text-warning" id="stat-active">0</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container glass-panel mt-4">
+                        <h3>Campaign Performance (Last 7 Days)</h3>
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Accounts View -->
+                <section id="view-accounts" class="page-view" style="display: none;">
+                    <div class="action-bar mb-3">
+                        <button id="add-account-btn" class="btn btn-primary">Add New Account</button>
+                    </div>
+                    
+                    <div class="accounts-grid" id="accounts-container">
+                        <!-- Accounts injected here -->
+                    </div>
+
+                    <!-- QR Code Modal -->
+    <div id="qr-modal" class="modal" style="display: none;">
+        <div class="modal-content glass-panel" style="text-align: center; max-width: 400px; padding: 2.5rem;">
+            <h3 style="margin-bottom: 0.8rem; font-size: 1.4rem; color: var(--accent-secondary);">Connect WhatsApp</h3>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                Open WhatsApp on your phone<br>Linked Devices -> Link a device
+            </p>
+            <div id="qrcode-container" style="display: flex; justify-content: center; margin-bottom: 2rem;"></div>
+            <button id="close-qr-btn" class="btn btn-danger" style="width: 100%;">Cancel Process</button>
+        </div>
+    </div>
+                </section>
+                
+                <!-- Campaigns View -->
+                <section id="view-campaigns" class="page-view" style="display: none;">
+                    <div class="glass-panel" style="padding: 2rem;">
+                        <h2 class="mb-3">Create New Campaign</h2>
+                        <form id="campaign-form">
+                            <div class="mb-3">
+                                <label>Campaign Name</label>
+                                <input type="text" id="camp-name" class="form-control" required style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                            </div>
+                            
+                            <div class="mb-3" style="display: flex; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <label>Upload Contacts (CSV)</label>
+                                    <input type="file" id="camp-csv" accept=".csv" class="form-control" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                                    <small class="text-muted">CSV must contain a header named "phone"</small>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>Manual Numbers (Comma separated)</label>
+                                    <textarea id="camp-manual" rows="2" class="form-control" placeholder="919876543210, 919876543211..." style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Message Template / Body</label>
+                                <select id="camp-template-select" class="form-control mb-2" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                                    <option value="">-- Write Custom Message Below --</option>
+                                    <!-- Templates populated here -->
+                                </select>
+                                <textarea id="camp-message" rows="4" class="form-control" placeholder="Hello {name}, ..." required style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;"></textarea>
+                            </div>
+
+                            <div class="mb-3" style="display: flex; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <label>Attachment (Image/Video/PDF)</label>
+                                    <input type="file" id="camp-media" class="form-control" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label>Schedule Time (Optional)</label>
+                                    <input type="datetime-local" id="camp-schedule" class="form-control" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; filter: invert(1); border: none; border-radius: 4px;">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mt-3">Start Campaign / Schedule</button>
+                        </form>
+                    </div>
+                </section>
+                <!-- Templates & Auto Replies View -->
+                <section id="view-templates" class="page-view" style="display: none;">
+                    <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+                        <h2 class="mb-3">Message Templates</h2>
+                        <!-- Simplified form for brevity -->
+                        <form id="template-form" class="mb-3">
+                            <input type="text" id="tpl-name" placeholder="Template Name" required class="form-control mb-3" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                            <textarea id="tpl-body" placeholder="Template Body" required rows="3" class="form-control mb-3" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;"></textarea>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">Attachment (Optional - Image/Video/PDF)</label>
+                                <input type="file" id="tpl-media" class="form-control mb-3" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Template</button>
+                        </form>
+                        <div id="templates-list"></div>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 2rem;">
+                        <h2 class="mb-3">Auto Replies</h2>
+                        <form id="autoreply-form" class="mb-3">
+                            <input type="text" id="ar-keyword" placeholder="Keyword (e.g. Price)" required class="form-control mb-3" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                            <textarea id="ar-body" placeholder="Reply Message" required rows="3" class="form-control mb-3" style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;"></textarea>
+                            <button type="submit" class="btn btn-primary">Add Auto Reply</button>
+                        </form>
+                        <div id="autoreplies-list"></div>
+                    </div>
+                </section>
+
+                <!-- Unified Inbox View -->
+                <section id="view-inbox" class="page-view" style="display: none;">
+                    <div class="glass-panel" style="padding: 2rem; height: 100%;">
+                        <h2 class="mb-3">Unified Inbox</h2>
+                        <div id="inbox-messages" style="display: flex; flex-direction: column; gap: 1rem; max-height: 600px; overflow-y: auto;">
+                            <!-- Messages injected here -->
+                            <p class="text-muted">Loading messages...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Extractor View -->
+                <section id="view-extractor" class="page-view" style="display: none;">
+                    <div class="glass-panel" style="padding: 2rem;">
+                        <h2 class="mb-3">Group & Contact Extractor</h2>
+                        <p class="mb-3 text-muted">Select an active account to extract all chat and group participants.</p>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <input type="number" id="ext-account-id" placeholder="Account ID (e.g. 1)" class="form-control" style="padding: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid var(--panel-border); border-radius: 4px;">
+                            <button id="btn-extract" class="btn btn-primary">Extract & Download CSV</button>
+                        </div>
+                        <div id="extractor-status" class="mt-3"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
